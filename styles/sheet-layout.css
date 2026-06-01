@@ -1,0 +1,137 @@
+/*
+ * Mythic Bastionland — Sheet Layout overrides.
+ *
+ * Intentionally UNLAYERED. The Mythic Bastionland system ships an unlayered
+ * stylesheet, and in the CSS cascade unlayered rules always beat @layer-ed
+ * rules. Modules also load after systems, so on equal specificity we win on
+ * order. Every selector is scoped to the system's actor sheet root
+ * (.mythic-bastionland.sheet.actor).
+ *
+ * The script (scripts/module.js) wraps the contiguous run of category blocks
+ * (abilities, passions, steeds, companions, properties, scars) in a single
+ * .mbsl-categories container and tags the properties block .mbsl-properties.
+ * The column count is published as --mb-list-columns on <body>.
+ */
+
+/* --------------------------------------------------------------------------
+ * Categories side by side
+ *
+ * Flow the category blocks into N balanced columns. `column-fill: balance`
+ * means a short category (e.g. two abilities) does not reserve a tall empty
+ * slot next to it — the next category packs up into that space, so columns end
+ * at roughly equal height. Each category is kept whole with `break-inside`.
+ * ------------------------------------------------------------------------ */
+.mythic-bastionland.sheet.actor .mbsl-categories {
+  column-count: var(--mb-list-columns, 2);
+  column-gap: 16px;
+  column-fill: balance;
+}
+
+.mythic-bastionland.sheet.actor .mbsl-category {
+  break-inside: avoid;
+  margin-bottom: 16px;
+}
+
+/* --------------------------------------------------------------------------
+ * Properties stands alone
+ *
+ * Properties always gets its own full-width band with no category beside it.
+ * `column-span: all` breaks the column flow: categories above it balance into
+ * columns, properties spans the full width, then categories below balance
+ * again. Because it is full width, let its own item list use the columns.
+ * ------------------------------------------------------------------------ */
+.mythic-bastionland.sheet.actor .mbsl-category.mbsl-properties {
+  column-span: all;
+}
+
+.mythic-bastionland.sheet.actor .mbsl-properties .col:has(> .item) {
+  display: grid;
+  grid-template-columns: repeat(var(--mb-list-columns, 2), minmax(0, 1fr));
+  gap: 8px 16px;
+  align-content: start;
+}
+
+.mythic-bastionland.sheet.actor .mbsl-properties .col:has(> .item) > .item {
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+ * Action buttons overlay the name (revealed on hover)
+ *
+ * Give the name the full column width by taking the action column out of flow:
+ * the buttons are absolutely positioned over the top-right of the row and hidden
+ * until the row is hovered (or a button is keyboard-focused). On hover only the
+ * slice of the name *behind* the icons fades down — done with a mask on the name
+ * itself (no background box, so there is no visible edge). The dimmed width comes
+ * from --mbsl-actions-w, which the script measures per row from the icon column.
+ * nowrap keeps the four quantity icons (+ - edit trash) on a single line.
+ * ------------------------------------------------------------------------ */
+.mythic-bastionland.sheet.actor .item {
+  position: relative;
+}
+
+.mythic-bastionland.sheet.actor .item > .col-9 {
+  flex-basis: 100%;
+  max-width: 100%;
+}
+
+.mythic-bastionland.sheet.actor .item > .col-3 {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: auto;
+  max-width: none;
+  flex: 0 0 auto;
+  opacity: 0;
+  z-index: 2;
+  transition: opacity 0.12s ease;
+}
+
+.mythic-bastionland.sheet.actor .item .grid.justify-content-end {
+  flex-wrap: nowrap;
+}
+
+.mythic-bastionland.sheet.actor .item:hover > .col-3,
+.mythic-bastionland.sheet.actor .item:focus-within > .col-3 {
+  opacity: 1;
+}
+
+.mythic-bastionland.sheet.actor .item:hover > .col-9,
+.mythic-bastionland.sheet.actor .item:focus-within > .col-9 {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 calc(100% - var(--mbsl-actions-w, 88px) - 10px),
+    rgba(0, 0, 0, 0.2) calc(100% - var(--mbsl-actions-w, 88px))
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 calc(100% - var(--mbsl-actions-w, 88px) - 10px),
+    rgba(0, 0, 0, 0.2) calc(100% - var(--mbsl-actions-w, 88px))
+  );
+}
+
+/* --------------------------------------------------------------------------
+ * Full-width item description
+ *
+ * The script moves each row's .item-description up to be a direct child of the
+ * .item row. As a flex child with a 100% basis it drops to its own line under
+ * the name and the buttons, so the description text flows under the buttons and
+ * fills the whole column instead of being boxed into the narrow text column.
+ * ------------------------------------------------------------------------ */
+.mythic-bastionland.sheet.actor .item > .item-description {
+  flex: 0 0 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+ * Hoisted stat line
+ *
+ * The script moves the weapon/armour stat line (damage die, A{n}, traits) up
+ * onto the name after a comma. Render it in the normal weight so it reads as a
+ * subtitle next to the bold name rather than part of it. The damage die keeps
+ * the system's inline-roll styling.
+ * ------------------------------------------------------------------------ */
+.mythic-bastionland.sheet.actor .item .text-bold .mbsl-stats {
+  font-weight: 400;
+}

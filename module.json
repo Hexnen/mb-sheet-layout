@@ -1,0 +1,17 @@
+{
+  "id": "mb-sheet-layout",
+  "title": "Mythic Bastionland — Sheet Layout",
+  "description": "Layout improvements for Mythic Bastionland actor sheets: item categories (abilities, passions, steeds, companions, scars) arranged side by side in balanced columns, with properties kept on its own full-width row. Driven by a per-user setting — does not modify the system's files.",
+  "version": "1.0.0",
+  "authors": [{ "name": "hexerpegi" }],
+  "compatibility": { "minimum": "13", "verified": "14" },
+  "esmodules": ["scripts/module.js"],
+  "styles": ["styles/sheet-layout.css"],
+  "languages": [{ "lang": "en", "name": "English", "path": "lang/en.json" }],
+  "relationships": {
+    "systems": [{ "id": "mythicbastionland", "type": "system" }]
+  },
+  "flags": {
+    "hotReload": { "extensions": ["css", "json"], "paths": ["styles", "lang"] }
+  }
+}

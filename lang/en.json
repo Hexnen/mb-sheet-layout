@@ -1,0 +1,7 @@
+{
+  "MBSL.Settings.ListColumns.Name": "Side-by-side categories",
+  "MBSL.Settings.ListColumns.Hint": "How many item categories (abilities, passions, steeds, companions, scars) to arrange side by side on actor sheets. Properties always takes its own full-width row.",
+  "MBSL.Settings.ListColumns.One": "1 (stacked)",
+  "MBSL.Settings.ListColumns.Two": "2 columns",
+  "MBSL.Settings.ListColumns.Three": "3 columns"
+}
