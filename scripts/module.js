@@ -112,9 +112,27 @@ function reflowItems(scrollable) {
 
   rows.forEach((row, i) => {
     if (widths[i]) row.style.setProperty("--mbsl-actions-w", `${widths[i]}px`);
+    else if (row.querySelector(":scope > .col-3")) measureLater(row);
   });
 }
 
+/**
+ * A sheet re-rendered while minimized (an actor update reaches every open
+ * sheet) has its .window-content at display:none, so every width reads 0 and
+ * the rows would keep the 88px fallback after the window is restored. Measure
+ * such a row the first time it is hovered or focused, which is exactly when the
+ * mask that uses the width appears. The listeners die with the row's DOM.
+ */
+function measureLater(row) {
+  const measure = () => {
+    row.removeEventListener("pointerenter", measure);
+    row.removeEventListener("focusin", measure);
+    const width = row.querySelector(":scope > .col-3")?.offsetWidth;
+    if (width) row.style.setProperty("--mbsl-actions-w", `${width}px`);
+  };
+  row.addEventListener("pointerenter", measure);
+  row.addEventListener("focusin", measure);
+}
 
 Hooks.on("renderMBActorSheet", (app, element) => {
   const root = element instanceof HTMLElement ? element : element?.[0];
