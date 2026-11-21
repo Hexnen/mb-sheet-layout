@@ -110,6 +110,31 @@
   );
 }
 
+/*
+ * Touch screens have no hover, so the hidden (opacity 0) buttons would still
+ * catch taps: a tap on the end of an item name would hit the invisible trash
+ * icon, and the system deletes items without a confirmation. Where the device
+ * cannot hover, keep the buttons visible (with the same name mask) instead.
+ */
+@media (hover: none), (pointer: coarse) {
+  .mythic-bastionland.sheet.actor .item > .col-3 {
+    opacity: 1;
+  }
+
+  .mythic-bastionland.sheet.actor .item > .col-9 {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      #000 calc(100% - var(--mbsl-actions-w, 88px) - 10px),
+      rgba(0, 0, 0, 0.2) calc(100% - var(--mbsl-actions-w, 88px))
+    );
+    mask-image: linear-gradient(
+      to right,
+      #000 calc(100% - var(--mbsl-actions-w, 88px) - 10px),
+      rgba(0, 0, 0, 0.2) calc(100% - var(--mbsl-actions-w, 88px))
+    );
+  }
+}
+
 /* --------------------------------------------------------------------------
  * Full-width item description
  *
