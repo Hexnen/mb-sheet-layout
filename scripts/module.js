@@ -17,7 +17,13 @@
 const MODULE_ID = "mb-sheet-layout";
 
 function applyColumnSetting() {
-  document.body.style.setProperty("--mb-list-columns", game.settings.get(MODULE_ID, "listColumns"));
+  const columns = game.settings.get(MODULE_ID, "listColumns");
+  // v14 can pop a sheet out into a detached browser window. That window copies
+  // <body>'s attributes only once, when it opens, so a later change of this
+  // setting must be pushed into every open detached window too.
+  const detached = foundry.applications.detached?.windows?.values() ?? [];
+  const bodies = [document.body, ...[...detached].map((d) => d.window?.document?.body)];
+  for (const body of bodies) body?.style.setProperty("--mb-list-columns", columns);
 }
 
 function groupCategories(scrollable) {
@@ -108,6 +114,7 @@ function reflowItems(scrollable) {
     if (widths[i]) row.style.setProperty("--mbsl-actions-w", `${widths[i]}px`);
   });
 }
+
 
 Hooks.on("renderMBActorSheet", (app, element) => {
   const root = element instanceof HTMLElement ? element : element?.[0];
