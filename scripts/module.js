@@ -90,16 +90,23 @@ function hoistStatLine(row, description) {
  *    mask dims exactly the slice of the name sitting behind the icons.
  */
 function reflowItems(scrollable) {
-  for (const row of scrollable.querySelectorAll(".item")) {
-    const description = row.querySelector(".item-description");
-    if (description) {
-      hoistStatLine(row, description);
-      if (description.parentElement !== row) row.appendChild(description);
-    }
+  const rows = [...scrollable.querySelectorAll(".item")];
 
-    const actions = row.querySelector(":scope > .col-3");
-    if (actions?.offsetWidth) row.style.setProperty("--mbsl-actions-w", `${actions.offsetWidth}px`);
+  // DOM moves first, then all measurements, then all style writes. Interleaving
+  // a write with the next row's offsetWidth read forced a synchronous layout per
+  // row on every sheet render (layout thrashing on long inventories).
+  for (const row of rows) {
+    const description = row.querySelector(".item-description");
+    if (!description) continue;
+    hoistStatLine(row, description);
+    if (description.parentElement !== row) row.appendChild(description);
   }
+
+  const widths = rows.map((row) => row.querySelector(":scope > .col-3")?.offsetWidth ?? 0);
+
+  rows.forEach((row, i) => {
+    if (widths[i]) row.style.setProperty("--mbsl-actions-w", `${widths[i]}px`);
+  });
 }
 
 Hooks.on("renderMBActorSheet", (app, element) => {
